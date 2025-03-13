@@ -10,9 +10,11 @@ interface ApiServices {
 
     @GET("api/character/")
     fun getCharactersByName (
-        @Query("name") appId: String,
+        @Query("name") name: String,
     ): Call<CharactersModelAPI>
 
     @GET("api/episode")
-    fun getEpisodes (): Call<EpisodesModelAPI>
+    fun getEpisodes (
+        @Query("page") page: Int,
+    ): Call<EpisodesModelAPI>
 }

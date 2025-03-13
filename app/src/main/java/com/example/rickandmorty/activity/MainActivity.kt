@@ -17,10 +17,8 @@ import com.bumptech.glide.Glide
 import com.example.rickandmorty.R
 import com.example.rickandmorty.ViewModel.MainViewModel
 import com.example.rickandmorty.models.CharactersModelAPI
-import kotlinx.coroutines.SupervisorJob
 
 class MainActivity : AppCompatActivity() {
-    private val job = SupervisorJob()
     private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +43,8 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        mainViewModel.loadEpisodes()
+
         mainViewModel.SearchName.observe(this, Observer { name ->
             mainViewModel.loadCharacters(name)
         })
@@ -52,7 +52,6 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.CharacterList.observe(this, Observer { list ->
             recyclerView.adapter = CharactersAdapter(list)
         })
-
     }
 }
 

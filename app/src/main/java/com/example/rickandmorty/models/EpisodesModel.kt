@@ -2,13 +2,13 @@ package com.example.rickandmorty.models
 
 data class EpisodesModelAPI(
     val info: Info,
-    val episodes: List<Episode>
+    var results: MutableList<Episode>
 ) {
     data class Info(
         val count: Int,
         val pages: Int,
-        val next: String,
-        val prev: Any
+        val next: String?,
+        val prev: String?
     )
 
     data class Episode(

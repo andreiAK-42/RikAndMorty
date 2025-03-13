@@ -9,6 +9,10 @@ import com.example.rickandmorty.models.CharactersModelAPI
 import com.example.rickandmorty.models.EpisodesModelAPI
 import com.example.rickandmorty.repository.MainRepository
 import com.example.rickandmorty.server.ApiClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
 
@@ -28,8 +32,6 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
     val CharacterList: LiveData<List<CharactersModelAPI.Result>> get() = _characterList
 
     fun loadCharacters(name: String) {
-        Log.d("ЗАГРУЗКА", "")
-        Log.d("ИМЯ", name)
         repository.getCharactersByName(name)
             .enqueue(object : retrofit2.Callback<CharactersModelAPI> {
                 override fun onResponse(
@@ -37,9 +39,35 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
                     response: Response<CharactersModelAPI>
                 ) {
                     if (response.isSuccessful) {
-                        Log.d("УСПЕШНО", "")
                         val data = response.body()
-                        data?.let { it ->
+                        data?.let {
+
+                            it.results?.forEach { n ->
+                                val episodeUrl = n.episode[0]
+                                if (episodeUrl != null) {
+                                    val episodeId = episodeUrl.split("/").last().toIntOrNull()
+                                    if (episodeId != null) {
+                                        val episodeName =
+                                            episodes.results?.find { it.id == episodeId }?.name
+                                        if (episodeName != null) {
+                                            n.episode[0] = episodeName
+                                        } else {
+                                            Log.e(
+                                                "MainViewModel",
+                                                "Episode not found for $episodeUrl" + "|" + episodes.results
+                                            )
+                                        }
+                                    } else {
+                                        Log.e(
+                                            "MainViewModel",
+                                            "Invalid episode ID in URL: $episodeUrl"
+                                        )
+                                    }
+                                } else {
+                                    Log.e("MainViewModel", "Episode URL is null")
+                                }
+                            }
+
                             _characterList.value = it.results
                         }
                     }
@@ -52,21 +80,37 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
     }
 
     fun loadEpisodes() {
-        repository.getEpisodes().enqueue(object : retrofit2.Callback<EpisodesModelAPI> {
+        CoroutineScope(Dispatchers.Main).launch {
+            for (n in 1..3) {
+                getEpisodesFor(n)
+                delay(200)
+            }
+        }
+    }
+
+    private fun getEpisodesFor(page: Int) {
+        repository.getEpisodes(page).enqueue(object : retrofit2.Callback<EpisodesModelAPI> {
             override fun onResponse(
                 call: Call<EpisodesModelAPI>,
                 response: Response<EpisodesModelAPI>
             ) {
                 if (response.isSuccessful) {
                     val data = response.body()
-                    data?.let {
-                        episodes = it
+                    if (data?.results != null) {
+                        if (page > 1 && ::episodes.isInitialized) {
+                            val newResults = mutableListOf<EpisodesModelAPI.Episode>()
+                            newResults.addAll(episodes.results)
+                            newResults.addAll(data.results)
+                            episodes.results = newResults
+                        } else {
+                            episodes = data
+                        }
                     }
                 }
             }
 
-            override fun onFailure(p0: Call<EpisodesModelAPI>, p1: Throwable) {
-                Log.e("Ошибка загрузки эпизодов", p1.message.toString())
+            override fun onFailure(call: Call<EpisodesModelAPI>, t: Throwable) {
+                Log.e("EpisodesLoad", "Failed to load episodes: ${t.message}")
             }
         })
     }
