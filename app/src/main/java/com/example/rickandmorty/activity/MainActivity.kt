@@ -63,7 +63,8 @@ class CharactersAdapter(private val charactersList: List<CharactersModelAPI.Resu
     class HumanViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(character: CharactersModelAPI.Result) {
             itemView.findViewById<TextView>(R.id.tvCharacterName).visibility = View.INVISIBLE
-            itemView.findViewById<TextView>(R.id.tvCharacterLastLocation).text = character.location.name
+            itemView.findViewById<TextView>(R.id.tvCharacterLastLocation).text =
+                character.location.name
             itemView.findViewById<TextView>(R.id.tvCharacterType).visibility = View.INVISIBLE
             itemView.findViewById<TextView>(R.id.tvCharacterFirstSeen).text = character.episode[0]
 
@@ -77,9 +78,11 @@ class CharactersAdapter(private val charactersList: List<CharactersModelAPI.Resu
         fun bind(character: CharactersModelAPI.Result) {
             itemView.findViewById<TextView>(R.id.tvCharacterName).text = character.name
             itemView.findViewById<TextView>(R.id.tvCharacterType).visibility = View.INVISIBLE
-            itemView.findViewById<TextView>(R.id.tvCharacterLastLocation).text = character.location.name
+            itemView.findViewById<TextView>(R.id.tvCharacterLastLocation).text =
+                character.location.name
             itemView.findViewById<TextView>(R.id.tvCharacterFirstSeen).text = character.episode[0]
-            itemView.findViewById<ImageView>(R.id.imgCharacterIcon).setImageDrawable(ContextCompat.getDrawable(itemView.context,R.drawable.no_image))
+            itemView.findViewById<ImageView>(R.id.imgCharacterIcon)
+                .setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.no_image))
         }
     }
 
@@ -87,7 +90,8 @@ class CharactersAdapter(private val charactersList: List<CharactersModelAPI.Resu
         fun bind(character: CharactersModelAPI.Result) {
             itemView.findViewById<TextView>(R.id.tvCharacterName).text = character.name
             itemView.findViewById<TextView>(R.id.tvCharacterType).text = character.species
-            itemView.findViewById<TextView>(R.id.tvCharacterLastLocation).text = character.location.name
+            itemView.findViewById<TextView>(R.id.tvCharacterLastLocation).text =
+                character.location.name
             itemView.findViewById<TextView>(R.id.tvCharacterFirstSeen).text = character.episode[0]
 
             Glide.with(itemView.context)

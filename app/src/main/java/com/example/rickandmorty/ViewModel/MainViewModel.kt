@@ -118,5 +118,4 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
     fun setSearchName(name: String) {
         _searchName.value = name
     }
-
 }
