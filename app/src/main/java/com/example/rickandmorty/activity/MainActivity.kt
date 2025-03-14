@@ -1,14 +1,15 @@
 package com.example.rickandmorty.activity
 
-import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -61,14 +62,9 @@ class CharactersAdapter(private val charactersList: List<CharactersModelAPI.Resu
 
     class HumanViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(character: CharactersModelAPI.Result) {
-
-            val tvName = itemView.findViewById<TextView>(R.id.tvCharacterName)
-            tvName.text = character.name
-            tvName.paintFlags = tvName.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-
-            itemView.findViewById<TextView>(R.id.tvCharacterLastLocation).text =
-                character.location.name
-
+            itemView.findViewById<TextView>(R.id.tvCharacterName).visibility = View.INVISIBLE
+            itemView.findViewById<TextView>(R.id.tvCharacterLastLocation).text = character.location.name
+            itemView.findViewById<TextView>(R.id.tvCharacterType).visibility = View.INVISIBLE
             itemView.findViewById<TextView>(R.id.tvCharacterFirstSeen).text = character.episode[0]
 
             Glide.with(itemView.context)
@@ -80,21 +76,18 @@ class CharactersAdapter(private val charactersList: List<CharactersModelAPI.Resu
     class AlienViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(character: CharactersModelAPI.Result) {
             itemView.findViewById<TextView>(R.id.tvCharacterName).text = character.name
-            itemView.findViewById<TextView>(R.id.tvCharacterLastLocation).text =
-                character.location.name
+            itemView.findViewById<TextView>(R.id.tvCharacterType).visibility = View.INVISIBLE
+            itemView.findViewById<TextView>(R.id.tvCharacterLastLocation).text = character.location.name
             itemView.findViewById<TextView>(R.id.tvCharacterFirstSeen).text = character.episode[0]
-
-            Glide.with(itemView.context)
-                .load(character.image)
-                .into(itemView.findViewById(R.id.imgCharacterIcon))
+            itemView.findViewById<ImageView>(R.id.imgCharacterIcon).setImageDrawable(ContextCompat.getDrawable(itemView.context,R.drawable.no_image))
         }
     }
 
     class OtherViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(character: CharactersModelAPI.Result) {
             itemView.findViewById<TextView>(R.id.tvCharacterName).text = character.name
-            itemView.findViewById<TextView>(R.id.tvCharacterLastLocation).text =
-                character.location.name
+            itemView.findViewById<TextView>(R.id.tvCharacterType).text = character.species
+            itemView.findViewById<TextView>(R.id.tvCharacterLastLocation).text = character.location.name
             itemView.findViewById<TextView>(R.id.tvCharacterFirstSeen).text = character.episode[0]
 
             Glide.with(itemView.context)
