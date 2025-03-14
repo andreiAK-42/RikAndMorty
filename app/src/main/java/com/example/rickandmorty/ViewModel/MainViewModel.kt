@@ -42,29 +42,25 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
                         val data = response.body()
                         data?.let {
 
-                            it.results?.forEach { n ->
+                            it.results.forEach { n ->
                                 val episodeUrl = n.episode[0]
-                                if (episodeUrl != null) {
-                                    val episodeId = episodeUrl.split("/").last().toIntOrNull()
-                                    if (episodeId != null) {
-                                        val episodeName =
-                                            episodes.results?.find { it.id == episodeId }?.name
-                                        if (episodeName != null) {
-                                            n.episode[0] = episodeName
-                                        } else {
-                                            Log.e(
-                                                "MainViewModel",
-                                                "Episode not found for $episodeUrl" + "|" + episodes.results
-                                            )
-                                        }
+                                val episodeId = episodeUrl.split("/").last().toIntOrNull()
+                                if (episodeId != null) {
+                                    val episodeName =
+                                        episodes.results.find { it.id == episodeId }?.name
+                                    if (episodeName != null) {
+                                        n.episode[0] = episodeName
                                     } else {
                                         Log.e(
                                             "MainViewModel",
-                                            "Invalid episode ID in URL: $episodeUrl"
+                                            "Episode not found for $episodeUrl" + "|" + episodes.results
                                         )
                                     }
                                 } else {
-                                    Log.e("MainViewModel", "Episode URL is null")
+                                    Log.e(
+                                        "MainViewModel",
+                                        "Invalid episode ID in URL: $episodeUrl"
+                                    )
                                 }
                             }
 
@@ -83,7 +79,6 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
         CoroutineScope(Dispatchers.Main).launch {
             for (n in 1..3) {
                 getEpisodesFor(n)
-                delay(200)
             }
         }
     }
@@ -97,14 +92,16 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
                 if (response.isSuccessful) {
                     val data = response.body()
                     if (data?.results != null) {
-                        if (page > 1 && ::episodes.isInitialized) {
+
+                        if (!::episodes.isInitialized) {
+                            episodes = data
+                        } else {
                             val newResults = mutableListOf<EpisodesModelAPI.Episode>()
                             newResults.addAll(episodes.results)
                             newResults.addAll(data.results)
                             episodes.results = newResults
-                        } else {
-                            episodes = data
                         }
+
                     }
                 }
             }
