@@ -3,9 +3,11 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 
+
 android {
     namespace = "com.example.rickandmorty"
     compileSdk = 35
+
 
     defaultConfig {
         applicationId = "com.example.rickandmorty"
@@ -34,9 +36,14 @@ android {
         jvmTarget = "1.8"
     }
 
-    buildFeatures{
+    buildFeatures {
         dataBinding = true
         viewBinding = true
+    }
+
+    configurations.all {
+        exclude(group = "com.intellij", module = "annotations")
+
     }
 }
 
@@ -51,7 +58,13 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+
+    testImplementation("io.mockk:mockk:1.13.5")
+    testImplementation("org.robolectric:robolectric:4.9")
+    testImplementation("androidx.test.ext:junit:1.1.5")
 }

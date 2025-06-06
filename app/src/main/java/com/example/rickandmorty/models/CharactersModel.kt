@@ -21,7 +21,7 @@ data class CharactersModelAPI(
         val origin: Origin,
         val location: Location,
         val image: String,
-        val episode: MutableList<String>,
+        var episode: List<String>,
         val url: String,
         val created: String,
     )
