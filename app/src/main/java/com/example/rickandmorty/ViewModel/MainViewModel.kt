@@ -11,7 +11,6 @@ import com.example.rickandmorty.repository.MainRepository
 import com.example.rickandmorty.server.ApiClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -23,12 +22,12 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
         )
     )
 
-    private lateinit var episodes: EpisodesModelAPI
+    public lateinit var episodes: EpisodesModelAPI
 
-    private val _searchName = MutableLiveData<String>()
+    val _searchName = MutableLiveData<String>()
     val SearchName: LiveData<String> get() = _searchName
 
-    private val _characterList = MutableLiveData<List<CharactersModelAPI.Result>>()
+    public val _characterList = MutableLiveData<List<CharactersModelAPI.Result>>()
     val CharacterList: LiveData<List<CharactersModelAPI.Result>> get() = _characterList
 
     fun loadCharacters(name: String) {
@@ -43,30 +42,35 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
                         data?.let {
 
                             it.results.forEach { n ->
-                                val episodeUrl = n.episode[0]
-                                val episodeId = episodeUrl.split("/").last().toIntOrNull()
-                                if (episodeId != null) {
-                                    val episodeName =
-                                        episodes.results.find { it.id == episodeId }?.name
-                                    if (episodeName != null) {
-                                        n.episode[0] = episodeName
+                                val episodeList = n.episode.toMutableList()
+                                if (episodeList.isNotEmpty()) {
+                                    val episodeUrl = episodeList[0]
+                                    val episodeId = episodeUrl.split("/").last().toIntOrNull()
+                                    if (episodeId != null) {
+                                        val episodeName =
+                                            episodes.results.find { it.id == episodeId }?.name
+                                        if (episodeName != null) {
+                                            episodeList[0] = episodeName
+                                        } else {
+                                            Log.e(
+                                                "MainViewModel",
+                                                "Episode not found for $episodeUrl" + "|" + episodes.results
+                                            )
+                                        }
                                     } else {
                                         Log.e(
                                             "MainViewModel",
-                                            "Episode not found for $episodeUrl" + "|" + episodes.results
+                                            "Invalid episode ID in URL: $episodeUrl"
                                         )
                                     }
-                                } else {
-                                    Log.e(
-                                        "MainViewModel",
-                                        "Invalid episode ID in URL: $episodeUrl"
-                                    )
                                 }
+                                n.episode = episodeList
                             }
 
-                            _characterList.value = it.results
+                            _characterList.postValue(it.results)
                         }
                     }
+
                 }
 
                 override fun onFailure(p0: Call<CharactersModelAPI>, p1: Throwable) {
@@ -76,10 +80,8 @@ class MainViewModel(val repository: MainRepository) : ViewModel() {
     }
 
     fun loadEpisodes() {
-        CoroutineScope(Dispatchers.Main).launch {
-            for (n in 1..3) {
-                getEpisodesFor(n)
-            }
+        for (n in 1..3) {
+            getEpisodesFor(n)
         }
     }
 

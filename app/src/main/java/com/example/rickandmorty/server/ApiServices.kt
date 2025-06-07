@@ -9,12 +9,12 @@ import retrofit2.http.Query
 interface ApiServices {
 
     @GET("api/character/")
-    fun getCharactersByName (
+    fun getCharactersByName(
         @Query("name") name: String,
     ): Call<CharactersModelAPI>
 
     @GET("api/episode")
-    fun getEpisodes (
+    fun getEpisodes(
         @Query("page") page: Int,
     ): Call<EpisodesModelAPI>
 }
